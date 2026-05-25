@@ -1,0 +1,52 @@
+{
+  "bills": [
+    {
+      "id": "electricity",
+      "name_zh": "電費",
+      "name_en": "Electricity",
+      "icon": "💡",
+      "months": [2, 4, 6, 8, 10, 12],
+      "late_fee": true
+    },
+    {
+      "id": "gas",
+      "name_zh": "煤氣費",
+      "name_en": "Gas",
+      "icon": "🔥",
+      "months": [2, 4, 6, 8, 10, 12],
+      "late_fee": true
+    },
+    {
+      "id": "water",
+      "name_zh": "水費",
+      "name_en": "Water",
+      "icon": "💧",
+      "months": [1, 5, 9],
+      "late_fee": true
+    },
+    {
+      "id": "management",
+      "name_zh": "管理費",
+      "name_en": "Management Fee",
+      "icon": "🏢",
+      "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      "late_fee": false
+    },
+    {
+      "id": "phone",
+      "name_zh": "電話費",
+      "name_en": "Phone Bill",
+      "icon": "📱",
+      "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      "late_fee": false
+    },
+    {
+      "id": "rates",
+      "name_zh": "差餉及地租",
+      "name_en": "Rates & Ground Rent",
+      "icon": "🏛️",
+      "months": [1, 4, 7, 10],
+      "late_fee": true
+    }
+  ]
+}

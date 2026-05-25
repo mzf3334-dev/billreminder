@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bill Reminder – 帳單提醒</title>
+  <style>
+    /* ── Reset & Base ── */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang HK",
+                   "Noto Sans HK", Arial, sans-serif;
+      background: #f0f4f8;
+      color: #1a202c;
+      padding: 32px 16px;
+    }
+
+    /* ── Email Card ── */
+    .email-card {
+      max-width: 620px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,.10);
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #1a56db 0%, #0e3fa3 100%);
+      padding: 32px 36px 28px;
+      color: #fff;
+    }
+    .header .icon { font-size: 36px; margin-bottom: 10px; }
+    .header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      margin-bottom: 6px;
+    }
+    .header .subtitle { font-size: 14px; opacity: .85; }
+    .header .date-badge {
+      display: inline-block;
+      margin-top: 14px;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.35);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* ── Summary Bar ── */
+    .summary {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .summary-item {
+      flex: 1;
+      padding: 18px 12px;
+      text-align: center;
+      border-right: 1px solid #e2e8f0;
+    }
+    .summary-item:last-child { border-right: none; }
+    .summary-item .num {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .summary-item .label { font-size: 12px; color: #718096; margin-top: 4px; }
+    .num.pending { color: #e53e3e; }
+    .num.paid    { color: #38a169; }
+    .num.total   { color: #2b6cb0; }
+
+    /* ── Body ── */
+    .body { padding: 28px 36px; }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #a0aec0;
+      margin-bottom: 14px;
+    }
+
+    /* ── Bill Table ── */
+    .bill-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+
+    .bill-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      border-radius: 10px;
+      border: 1.5px solid #e2e8f0;
+      background: #f7fafc;
+      transition: border-color .2s;
+    }
+    .bill-row.unpaid { border-color: #fed7d7; background: #fff5f5; }
+    .bill-row.paid   { border-color: #c6f6d5; background: #f0fff4; opacity: .82; }
+
+    .bill-icon { font-size: 22px; flex-shrink: 0; }
+
+    .bill-info { flex: 1 1 auto; min-width: 0; }
+    .bill-name { font-size: 15px; font-weight: 700; }
+    .bill-meta { font-size: 12px; color: #718096; margin-top: 2px; }
+
+    .late-fee-tag {
+      display: inline-block;
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffc107;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 1px 7px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    /* Status Badge */
+    .status-badge {
+      flex-shrink: 0;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+    }
+    .status-badge.unpaid {
+      background: #fff5f5;
+      color: #c53030;
+      border: 1.5px solid #fc8181;
+    }
+    .status-badge.paid {
+      background: #f0fff4;
+      color: #276749;
+      border: 1.5px solid #68d391;
+    }
+
+    /* Mark-Paid Button */
+    .btn-paid {
+      flex-shrink: 0;
+      display: inline-block;
+      background: linear-gradient(135deg, #38a169, #276749);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px 14px;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(56,161,105,.35);
+    }
+    .btn-paid:hover { background: linear-gradient(135deg, #2f855a, #1c4532); }
+
+    /* ── Alert Box ── */
+    .alert {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      background: #fffbeb;
+      border: 1.5px solid #f6c84b;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 28px;
+      font-size: 13px;
+      color: #744210;
+    }
+    .alert .alert-icon { font-size: 20px; flex-shrink: 0; }
+
+    /* ── Footer ── */
+    .footer {
+      background: #f7fafc;
+      border-top: 1px solid #e2e8f0;
+      padding: 22px 36px;
+      text-align: center;
+      font-size: 12px;
+      color: #a0aec0;
+      line-height: 1.7;
+    }
+    .footer a { color: #4299e1; text-decoration: none; }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .body { padding: 20px 18px; }
+      .header { padding: 24px 20px 20px; }
+      .footer { padding: 18px 18px; }
+      .bill-row { flex-wrap: wrap; }
+      .summary-item .num { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="email-card">
+
+  <!-- ══ HEADER ══ -->
+  <div class="header">
+    <div class="icon">🔔</div>
+    <h1>每月帳單提醒</h1>
+    <div class="subtitle">Monthly Bill Reminder</div>
+    <div class="date-badge">📅 2026年 5月 1日</div>
+  </div>
+
+  <!-- ══ SUMMARY ══ -->
+  <div class="summary">
+    <div class="summary-item">
+      <div class="num total">4</div>
+      <div class="label">本月帳單</div>
+    </div>
+    <div class="summary-item">
+      <div class="num pending">3</div>
+      <div class="label">待繳費</div>
+    </div>
+    <div class="summary-item">
+      <div class="num paid">1</div>
+      <div class="label">已繳費</div>
+    </div>
+  </div>
+
+  <!-- ══ BODY ══ -->
+  <div class="body">
+
+    <!-- Late-fee alert -->
+    <div class="alert">
+      <span class="alert-icon">⚠️</span>
+      <div>
+        <strong>注意：部分帳單有遲交附加費。</strong><br>
+        請盡快繳清帶有 <span style="background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:4px;padding:0 5px;font-size:11px;font-weight:700;">遲交費</span> 標籤的帳單，以免產生額外費用。
+      </div>
+    </div>
+
+    <div class="section-title">本月帳單清單</div>
+
+    <div class="bill-list">
+
+      <!-- ── Unpaid bill (with late fee) ── -->
+      <div class="bill-row unpaid">
+        <div class="bill-icon">💧</div>
+        <div class="bill-info">
+          <div class="bill-name">
+            水費
+            <span class="late-fee-tag">⚡ 遲交費</span>
+          </div>
+          <div class="bill-meta">Water &nbsp;·&nbsp; 繳費月份：1、5、9 月</div>
+        </div>
+        <div class="status-badge unpaid">⏳ 未繳</div>
+        <!-- In real email this href links to the GitHub Actions webhook / API endpoint -->
+        <a class="btn-paid" href="#">✓ 標記已繳</a>
+      </div>
+
+      <!-- ── Unpaid bill (no late fee) ── -->
+      <div class="bill-row unpaid">
+        <div class="bill-icon">🏢</div>
+        <div class="bill-info">
+          <div class="bill-name">管理費</div>
+          <div class="bill-meta">Management Fee &nbsp;·&nbsp; 每月繳費</div>
+        </div>
+        <div class="status-badge unpaid">⏳ 未繳</div>
+        <a class="btn-paid" href="#">✓ 標記已繳</a>
+      </div>
+
+      <!-- ── Unpaid bill (no late fee) ── -->
+      <div class="bill-row unpaid">
+        <div class="bill-icon">📱</div>
+        <div class="bill-info">
+          <div class="bill-name">電話費</div>
+          <div class="bill-meta">Phone Bill &nbsp;·&nbsp; 每月繳費</div>
+        </div>
+        <div class="status-badge unpaid">⏳ 未繳</div>
+        <a class="btn-paid" href="#">✓ 標記已繳</a>
+      </div>
+
+      <!-- ── Already Paid ── -->
+      <div class="bill-row paid">
+        <div class="bill-icon">💡</div>
+        <div class="bill-info">
+          <div class="bill-name" style="text-decoration:line-through;color:#718096;">
+            差餉及地租
+            <span class="late-fee-tag">⚡ 遲交費</span>
+          </div>
+          <div class="bill-meta">Rates &amp; Ground Rent &nbsp;·&nbsp; 繳費月份：1、4、7、10 月</div>
+        </div>
+        <div class="status-badge paid">✅ 已繳</div>
+      </div>
+
+    </div><!-- /bill-list -->
+
+    <!-- ── Next Reminder Note ── -->
+    <div style="background:#ebf8ff;border:1.5px solid #bee3f8;border-radius:10px;padding:14px 18px;font-size:13px;color:#2c5282;">
+      📬 <strong>下次提醒：</strong> 如有未繳帳單，系統將於 <strong>5月3日</strong> 再次發送提醒，直至所有帳單繳清為止。
+    </div>
+
+  </div><!-- /body -->
+
+  <!-- ══ FOOTER ══ -->
+  <div class="footer">
+    此電郵由 <strong>Bill Reminder Bot</strong> 自動發出，請勿直接回覆。<br>
+    如需更改設定，請前往 <a href="#">GitHub Repository</a> 修改帳單清單。<br>
+    <span style="color:#cbd5e0;">© 2026 Bill Reminder · Powered by GitHub Actions</span>
+  </div>
+
+</div><!-- /email-card -->
+
+</body>
+</html>

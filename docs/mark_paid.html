@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>標記已繳 – Bill Reminder</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang HK",
+                   "Noto Sans HK", Arial, sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.10);
+      max-width: 440px;
+      width: 100%;
+      overflow: hidden;
+    }
+    .card-header {
+      background: linear-gradient(135deg, #1a56db 0%, #0e3fa3 100%);
+      padding: 28px 32px;
+      color: #fff;
+      text-align: center;
+    }
+    .card-header .logo { font-size: 40px; margin-bottom: 8px; }
+    .card-header h1 { font-size: 20px; font-weight: 700; }
+    .card-body { padding: 32px; }
+
+    /* ── States ── */
+    .state { display: none; }
+    .state.active { display: block; }
+
+    /* Setup state */
+    .setup-desc {
+      font-size: 14px; color: #4a5568; margin-bottom: 20px; line-height: 1.6;
+    }
+    label { display: block; font-size: 13px; font-weight: 600;
+            color: #2d3748; margin-bottom: 6px; }
+    input[type="text"], input[type="password"] {
+      width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0;
+      border-radius: 8px; font-size: 14px; outline: none;
+      transition: border-color .2s;
+    }
+    input:focus { border-color: #1a56db; }
+    .input-hint { font-size: 11px; color: #a0aec0; margin-top: 4px; }
+
+    /* Confirm state */
+    .bill-card {
+      background: #fff5f5; border: 1.5px solid #fed7d7;
+      border-radius: 10px; padding: 18px 20px;
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 20px;
+    }
+    .bill-icon { font-size: 28px; }
+    .bill-name { font-size: 18px; font-weight: 700; color: #1a202c; }
+    .bill-sub  { font-size: 13px; color: #718096; margin-top: 2px; }
+    .late-tag {
+      display: inline-block; background: #fff3cd; color: #856404;
+      border: 1px solid #ffc107; border-radius: 5px;
+      font-size: 11px; font-weight: 600; padding: 1px 7px; margin-left: 6px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: block; width: 100%; padding: 12px;
+      border: none; border-radius: 10px; font-size: 15px;
+      font-weight: 700; cursor: pointer; margin-top: 10px;
+      transition: opacity .15s;
+    }
+    .btn:hover { opacity: .88; }
+    .btn-confirm {
+      background: linear-gradient(135deg, #38a169, #276749);
+      color: #fff; box-shadow: 0 2px 8px rgba(56,161,105,.35);
+    }
+    .btn-save {
+      background: linear-gradient(135deg, #1a56db, #0e3fa3);
+      color: #fff; box-shadow: 0 2px 8px rgba(26,86,219,.35);
+    }
+    .btn-secondary {
+      background: #edf2f7; color: #4a5568;
+    }
+
+    /* Loading */
+    .spinner {
+      width: 36px; height: 36px; margin: 0 auto 16px;
+      border: 4px solid #e2e8f0;
+      border-top-color: #1a56db;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { text-align: center; color: #4a5568; font-size: 14px; }
+
+    /* Success / Error */
+    .result-icon { font-size: 52px; text-align: center; margin-bottom: 12px; }
+    .result-title { font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+    .result-desc  { font-size: 14px; color: #718096; text-align: center; line-height: 1.6; }
+    .success .result-title { color: #276749; }
+    .error   .result-title { color: #c53030; }
+
+    /* Token info */
+    .token-info {
+      background: #ebf8ff; border: 1px solid #bee3f8; border-radius: 8px;
+      padding: 12px 14px; font-size: 12px; color: #2c5282;
+      margin-top: 16px; line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="card-header">
+    <div class="logo">🔔</div>
+    <h1>Bill Reminder</h1>
+  </div>
+  <div class="card-body">
+
+    <!-- ── STATE: Setup (first-time token entry) ── -->
+    <div id="state-setup" class="state">
+      <p class="setup-desc">
+        首次使用需要輸入你的 <strong>GitHub Personal Access Token (PAT)</strong>，
+        以便此頁面調用 GitHub API 更新帳單狀態。<br><br>
+        Token 只會儲存在你的瀏覽器本地（localStorage），不會上傳到任何伺服器。
+      </p>
+      <div style="margin-bottom:16px;">
+        <label for="pat-input">GitHub PAT（需要 <code>workflow</code> 權限）</label>
+        <input type="password" id="pat-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"/>
+        <div class="input-hint">
+          前往 GitHub → Settings → Developer Settings → Personal Access Tokens → Fine-grained tokens
+        </div>
+      </div>
+      <button class="btn btn-save" id="btn-save-token">儲存並繼續</button>
+      <div class="token-info">
+        💡 下次使用時無需再次輸入。如需更換 Token，請清除瀏覽器 localStorage。
+      </div>
+    </div>
+
+    <!-- ── STATE: Confirm Payment ── -->
+    <div id="state-confirm" class="state">
+      <div class="bill-card">
+        <div class="bill-icon" id="confirm-icon">💧</div>
+        <div>
+          <div class="bill-name" id="confirm-name">水費</div>
+          <div class="bill-sub" id="confirm-period">2026年 5月</div>
+        </div>
+      </div>
+      <p style="font-size:14px;color:#4a5568;margin-bottom:20px;line-height:1.6;">
+        確認將此帳單標記為 <strong style="color:#276749;">✅ 已繳</strong>？<br>
+        確認後系統將更新紀錄，本月不再提醒此項目。
+      </p>
+      <button class="btn btn-confirm" id="btn-confirm">✓ 確認已繳</button>
+      <button class="btn btn-secondary" id="btn-cancel">取消</button>
+    </div>
+
+    <!-- ── STATE: Loading ── -->
+    <div id="state-loading" class="state">
+      <div style="padding: 20px 0;">
+        <div class="spinner"></div>
+        <p class="loading-text">正在更新帳單狀態，請稍候…</p>
+      </div>
+    </div>
+
+    <!-- ── STATE: Success ── -->
+    <div id="state-success" class="state success">
+      <div style="padding: 12px 0;">
+        <div class="result-icon">✅</div>
+        <div class="result-title">已成功標記為已繳！</div>
+        <p class="result-desc" id="success-desc">
+          帳單紀錄已更新，本月不再收到此項目的提醒。
+        </p>
+      </div>
+    </div>
+
+    <!-- ── STATE: Error ── -->
+    <div id="state-error" class="state error">
+      <div style="padding: 12px 0;">
+        <div class="result-icon">❌</div>
+        <div class="result-title">操作失敗</div>
+        <p class="result-desc" id="error-desc">請稍後重試，或手動在 GitHub Actions 中觸發 mark-paid 工作流程。</p>
+        <button class="btn btn-confirm" id="btn-retry" style="margin-top:20px;">重試</button>
+      </div>
+    </div>
+
+  </div><!-- /card-body -->
+</div><!-- /card -->
+
+<script>
+  // ── Constants ──────────────────────────────────────────────────────────────
+  const PAT_KEY = "billreminder_gh_pat";
+
+  // Bill metadata (icon + late-fee flag) for display purposes
+  const BILL_META = {
+    electricity: { icon: "💡", name_zh: "電費",      late_fee: true  },
+    gas:         { icon: "🔥", name_zh: "煤氣費",    late_fee: true  },
+    water:       { icon: "💧", name_zh: "水費",      late_fee: true  },
+    management:  { icon: "🏢", name_zh: "管理費",    late_fee: false },
+    phone:       { icon: "📱", name_zh: "電話費",    late_fee: false },
+    rates:       { icon: "🏛️", name_zh: "差餉及地租", late_fee: true },
+  };
+
+  // ── Parse URL params ────────────────────────────────────────────────────────
+  const params   = new URLSearchParams(window.location.search);
+  const billId   = params.get("bill_id") || "";
+  const year     = params.get("year")    || "";
+  const month    = params.get("month")   || "";
+  const token    = params.get("token")   || "";
+  const nameFromUrl = params.get("name") || "";
+
+  // Derive repo owner/name from the current page URL
+  // GitHub Pages URL: https://<owner>.github.io/<repo>/mark_paid.html
+  const pathParts  = window.location.pathname.split("/").filter(Boolean);
+  const repoName   = pathParts[0] || "";
+  const ownerMatch = window.location.hostname.match(/^([^.]+)\.github\.io$/);
+  const owner      = ownerMatch ? ownerMatch[1] : "";
+
+  // ── Helpers ─────────────────────────────────────────────────────────────────
+  function showState(id) {
+    document.querySelectorAll(".state").forEach(el => el.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+
+  function getSavedPat() {
+    return localStorage.getItem(PAT_KEY) || "";
+  }
+
+  function savePat(pat) {
+    localStorage.setItem(PAT_KEY, pat.trim());
+  }
+
+  // ── Populate confirm screen ──────────────────────────────────────────────────
+  function populateConfirm() {
+    const meta = BILL_META[billId] || {};
+    const icon = meta.icon || "📄";
+    const name = nameFromUrl || meta.name_zh || billId;
+    const lateBadge = meta.late_fee
+      ? ' <span class="late-tag">⚡ 遲交費</span>' : "";
+
+    document.getElementById("confirm-icon").textContent = icon;
+    document.getElementById("confirm-name").innerHTML   = name + lateBadge;
+    document.getElementById("confirm-period").textContent =
+      `${year}年 ${month}月`;
+  }
+
+  // ── Trigger GitHub Actions workflow_dispatch ─────────────────────────────────
+  async function triggerMarkPaid(pat) {
+    const url = `https://api.github.com/repos/${owner}/${repoName}/actions/workflows/mark-paid.yml/dispatches`;
+    const body = {
+      ref: "main",
+      inputs: { bill_id: billId, year, month, token }
+    };
+
+    const resp = await fetch(url, {
+      method:  "POST",
+      headers: {
+        "Authorization": `Bearer ${pat}`,
+        "Accept":        "application/vnd.github+json",
+        "Content-Type":  "application/json",
+        "X-GitHub-Api-Version": "2022-11-28"
+      },
+      body: JSON.stringify(body)
+    });
+
+    return resp; // 204 = success
+  }
+
+  // ── Event: Save token ────────────────────────────────────────────────────────
+  document.getElementById("btn-save-token").addEventListener("click", () => {
+    const pat = document.getElementById("pat-input").value.trim();
+    if (!pat.startsWith("ghp_") && !pat.startsWith("github_pat_")) {
+      alert("請輸入有效的 GitHub PAT（以 ghp_ 或 github_pat_ 開頭）");
+      return;
+    }
+    savePat(pat);
+    populateConfirm();
+    showState("state-confirm");
+  });
+
+  // ── Event: Confirm payment ───────────────────────────────────────────────────
+  document.getElementById("btn-confirm").addEventListener("click", async () => {
+    const pat = getSavedPat();
+    if (!pat) { showState("state-setup"); return; }
+
+    showState("state-loading");
+    try {
+      const resp = await triggerMarkPaid(pat);
+      if (resp.status === 204) {
+        const meta = BILL_META[billId] || {};
+        const name = nameFromUrl || meta.name_zh || billId;
+        document.getElementById("success-desc").textContent =
+          `「${name}」${year}年${month}月 已標記為已繳，本月不再提醒此項目。`;
+        showState("state-success");
+      } else {
+        const errText = await resp.text();
+        document.getElementById("error-desc").textContent =
+          `API 錯誤 ${resp.status}：${errText.substring(0, 200)}`;
+        showState("state-error");
+      }
+    } catch (err) {
+      document.getElementById("error-desc").textContent =
+        `網絡錯誤：${err.message}`;
+      showState("state-error");
+    }
+  });
+
+  // ── Event: Cancel ────────────────────────────────────────────────────────────
+  document.getElementById("btn-cancel").addEventListener("click", () => {
+    window.close();
+    // Fallback if window.close() is blocked
+    document.getElementById("confirm-name").closest(".card-body").innerHTML =
+      `<p style="text-align:center;padding:32px;color:#718096;">已取消操作。可關閉此視窗。</p>`;
+  });
+
+  // ── Event: Retry ─────────────────────────────────────────────────────────────
+  document.getElementById("btn-retry").addEventListener("click", () => {
+    populateConfirm();
+    showState("state-confirm");
+  });
+
+  // ── Init ─────────────────────────────────────────────────────────────────────
+  (function init() {
+    if (!billId || !year || !month || !token) {
+      showState("state-error");
+      document.getElementById("error-desc").textContent =
+        "連結參數不完整，請從提醒電郵中重新點擊「標記已繳」按鈕。";
+      return;
+    }
+
+    if (!owner || !repoName) {
+      showState("state-error");
+      document.getElementById("error-desc").textContent =
+        "無法從頁面 URL 解析 GitHub 倉庫資訊，請確認 GitHub Pages 已正確設定。";
+      return;
+    }
+
+    if (getSavedPat()) {
+      populateConfirm();
+      showState("state-confirm");
+    } else {
+      showState("state-setup");
+    }
+  })();
+</script>
+</body>
+</html>

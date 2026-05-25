@@ -1,0 +1,4 @@
+# Python dependencies for Bill Reminder
+# Install with: pip install -r requirements.txt
+# (smtplib, json, hmac, hashlib are all part of the Python standard library)
+# No third-party packages are required for the core scripts.

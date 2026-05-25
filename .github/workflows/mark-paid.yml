@@ -1,0 +1,58 @@
+name: "Mark Bill as Paid"
+
+on:
+  workflow_dispatch:
+    inputs:
+      bill_id:
+        description: "Bill ID (e.g. water, electricity)"
+        required: true
+        type: string
+      year:
+        description: "Year (e.g. 2026)"
+        required: true
+        type: string
+      month:
+        description: "Month number (1-12)"
+        required: true
+        type: string
+      token:
+        description: "HMAC verification token from the email link"
+        required: true
+        type: string
+
+jobs:
+  mark-paid:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write       # needs to commit bills_state.json
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Use a PAT so the push triggers downstream workflows if needed
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Mark bill as paid
+        env:
+          MARK_PAID_TOKEN: ${{ secrets.MARK_PAID_TOKEN }}
+        run: |
+          python mark_paid.py \
+            "${{ github.event.inputs.bill_id }}" \
+            "${{ github.event.inputs.year }}"    \
+            "${{ github.event.inputs.month }}"   \
+            "${{ github.event.inputs.token }}"
+
+      - name: Commit updated state
+        run: |
+          git config user.name  "Bill Reminder Bot"
+          git config user.email "bill-reminder-bot@users.noreply.github.com"
+          git add bills_state.json
+          git diff --cached --quiet || git commit -m \
+            "chore: mark ${{ github.event.inputs.bill_id }} paid for ${{ github.event.inputs.year }}/${{ github.event.inputs.month }} [skip ci]"
+          git push

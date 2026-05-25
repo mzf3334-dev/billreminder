@@ -1,0 +1,62 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+*.log
+
+# ── Virtual environments ───────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+.env/
+
+# ── Environment / secrets files ───────────────────────────────────────────────
+# NEVER commit credentials or tokens to the repo.
+# Store all secrets in GitHub Repository Secrets instead.
+.env
+.env.*
+*.env
+secrets.json
+secrets.yaml
+secrets.yml
+config.local.json
+
+# ── Local settings override ────────────────────────────────────────────────────
+# If you want to test locally, copy bills.json → bills.local.json
+# and add your own overrides there. It will be ignored by git.
+bills.local.json
+settings.local.json
+
+# ── IDE / Editor ──────────────────────────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+desktop.ini
+$RECYCLE.BIN/
+
+# ── NOTE: bills_state.json is intentionally tracked by git ────────────────────
+# It stores which bills have been paid each month and must be committed
+# by the mark-paid GitHub Actions workflow to persist state across runs.
+# bills_state.json   <-- DO NOT add this line
