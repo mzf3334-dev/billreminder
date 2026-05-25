@@ -56,6 +56,9 @@ Thumbs.db
 desktop.ini
 $RECYCLE.BIN/
 
+# ── Test artifacts ────────────────────────────────────────────────────────────
+test_email_output.html
+
 # ── NOTE: bills_state.json is intentionally tracked by git ────────────────────
 # It stores which bills have been paid each month and must be committed
 # by the mark-paid GitHub Actions workflow to persist state across runs.
