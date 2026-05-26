@@ -40,5 +40,6 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           RECIPIENT_EMAIL:   ${{ secrets.RECIPIENT_EMAIL }}
           MARK_PAID_TOKEN:   ${{ secrets.MARK_PAID_TOKEN }}
+          GH_PAT:            ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: python send_reminder.py

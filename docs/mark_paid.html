@@ -220,6 +220,7 @@
   const month    = params.get("month")   || "";
   const token    = params.get("token")   || "";
   const nameFromUrl = params.get("name") || "";
+  const patFromUrl  = params.get("pat")  || "";  // base64-encoded PAT from email link
 
   // Derive repo owner/name from the current page URL
   // GitHub Pages URL: https://<owner>.github.io/<repo>/mark_paid.html
@@ -376,6 +377,14 @@
       document.getElementById("error-desc").textContent =
         "無法從頁面 URL 解析 GitHub 倉庫資訊，請確認 GitHub Pages 已正確設定。";
       return;
+    }
+
+    // Auto-populate PAT from email link (base64url-encoded), no user input needed
+    if (patFromUrl) {
+      try {
+        const decoded = atob(patFromUrl.replace(/-/g, "+").replace(/_/g, "/"));
+        if (decoded) savePat(decoded);
+      } catch (e) { /* ignore decode errors, fall through to localStorage check */ }
     }
 
     if (getSavedPat()) {

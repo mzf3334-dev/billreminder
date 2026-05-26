@@ -5,6 +5,7 @@ Generates the HTML reminder email body, matching the confirmed prototype style.
 
 import hmac
 import hashlib
+import base64
 from datetime import datetime, timedelta
 
 MONTH_NAMES_ZH = {
@@ -72,6 +73,7 @@ def generate_html(
     month: int,
     pages_base_url: str,
     secret: str,
+    gh_pat: str = "",
 ) -> str:
     """
     Generate the full HTML email body.
@@ -82,6 +84,7 @@ def generate_html(
     :param month:          Current month (int)
     :param pages_base_url: GitHub Pages base URL, e.g. https://user.github.io/billreminder
     :param secret:         MARK_PAID_TOKEN secret
+    :param gh_pat:         GitHub PAT to embed in mark-paid URLs (skips mobile input)
     :return:               Complete HTML string
     """
     paid_count = sum(1 for b in month_bills if month_state.get(b["id"], False))
@@ -101,10 +104,14 @@ def generate_html(
         token = make_token(bid, year, month, secret)
         import urllib.parse
         name_encoded = urllib.parse.quote(bill["name_zh"])
+        pat_param = ""
+        if gh_pat:
+            pat_encoded = base64.urlsafe_b64encode(gh_pat.encode()).decode()
+            pat_param = f"&pat={pat_encoded}"
         mark_url = (
             f"{pages_base_url}/mark_paid.html"
             f"?bill_id={bid}&year={year}&month={month}"
-            f"&token={token}&name={name_encoded}"
+            f"&token={token}&name={name_encoded}{pat_param}"
         )
         rows_html += build_bill_row(bill, is_paid, mark_url)
 

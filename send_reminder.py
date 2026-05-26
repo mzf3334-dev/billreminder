@@ -86,6 +86,7 @@ def main() -> None:
     gmail_pass   = require_env("GMAIL_APP_PASSWORD")
     recipient    = require_env("RECIPIENT_EMAIL")
     secret       = require_env("MARK_PAID_TOKEN")
+    gh_pat       = os.environ.get("GH_PAT", "").strip()
     repo         = require_env("GITHUB_REPOSITORY")          # owner/repo
     owner        = repo.split("/")[0]
     repo_name    = repo.split("/")[1]
@@ -99,6 +100,7 @@ def main() -> None:
         month=month,
         pages_base_url=pages_base,
         secret=secret,
+        gh_pat=gh_pat,
     )
 
     # Build subject
