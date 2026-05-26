@@ -1,7 +1,8 @@
 {
   "2026": {
     "5": {
-      "water": true
+      "water": true,
+      "management": true
     }
   }
 }
