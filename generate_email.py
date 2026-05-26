@@ -174,6 +174,20 @@ def generate_html(
       border:none;border-radius:8px;font-size:12px;font-weight:700;
       padding:7px 14px;text-decoration:none;white-space:nowrap;
       box-shadow:0 2px 6px rgba(56,161,105,.35);}}
+    @media only screen and (max-width:480px){{
+      body{{padding:12px 8px;}}
+      .header{{padding:20px 18px 16px;}}
+      .header h1{{font-size:18px;}}
+      .body{{padding:18px 14px;}}
+      .summary-item .num{{font-size:22px;}}
+      .bill-row{{flex-wrap:wrap;gap:8px;padding:10px 12px;}}
+      .bill-icon{{font-size:20px;}}
+      .bill-name{{font-size:14px;}}
+      .status-badge{{font-size:11px;padding:3px 9px;}}
+      .btn-paid{{display:block;width:100%;text-align:center;
+        padding:9px 0;font-size:13px;margin-top:4px;}}
+      .footer{{padding:16px 14px;}}
+    }}
     .alert{{display:flex;gap:12px;align-items:flex-start;background:#fffbeb;
             border:1.5px solid #f6c84b;border-radius:10px;padding:14px 18px;
             margin-bottom:28px;font-size:13px;color:#744210;}}

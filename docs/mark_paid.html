@@ -112,6 +112,12 @@
       padding: 12px 14px; font-size: 12px; color: #2c5282;
       margin-top: 16px; line-height: 1.6;
     }
+    .btn-reset-token {
+      display: inline-block; margin-top: 12px; padding: 8px 18px;
+      background: #edf2f7; color: #4a5568; border: none; border-radius: 8px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    .btn-reset-token:hover { background: #e2e8f0; }
   </style>
 </head>
 <body>
@@ -185,6 +191,8 @@
         <div class="result-title">操作失敗</div>
         <p class="result-desc" id="error-desc">請稍後重試，或手動在 GitHub Actions 中觸發 mark-paid 工作流程。</p>
         <button class="btn btn-confirm" id="btn-retry" style="margin-top:20px;">重試</button>
+        <button class="btn-reset-token" id="btn-reset-token">🔑 重置 / 更換 Token</button>
+        <div class="token-info" id="error-hint" style="display:none;"></div>
       </div>
     </div>
 
@@ -270,6 +278,13 @@
     return resp; // 204 = success
   }
 
+  // ── Helper: Reset saved token ─────────────────────────────────────────────
+  function resetToken() {
+    localStorage.removeItem(PAT_KEY);
+    document.getElementById("pat-input").value = "";
+    showState("state-setup");
+  }
+
   // ── Event: Save token ────────────────────────────────────────────────────────
   document.getElementById("btn-save-token").addEventListener("click", () => {
     const pat = document.getElementById("pat-input").value.trim();
@@ -298,8 +313,26 @@
         showState("state-success");
       } else {
         const errText = await resp.text();
+        let hint = "";
+        if (resp.status === 401) {
+          hint = "❌ Token 無效或已過期。請點擊「重置 / 更換 Token」重新輸入有效的 GitHub PAT。";
+        } else if (resp.status === 403) {
+          hint = "🔒 Token 權限不足。請確認 Fine-grained Token 已開啟 Actions: Read and write 權限；或 Classic Token 已勾選 workflow scope。點擊「重置 / 更換 Token」重新輸入。";
+        } else if (resp.status === 404) {
+          hint = `🔍 找不到工作流程 (404)。可能原因：\n① Token 權限不足（Fine-grained Token 需要 Actions: Read and write）\n② 倉庫 ${owner}/${repoName} 不存在或無法存取\n③ GitHub Actions 未啟用（請到 Actions 頁籤開啟）\n點擊「重置 / 更換 Token」重新輸入後重試。`;
+        } else if (resp.status === 422) {
+          hint = "⚠️ 請求參數錯誤 (422)，請確認帳單連結是最新版本的提醒郵件。";
+        }
         document.getElementById("error-desc").textContent =
           `API 錯誤 ${resp.status}：${errText.substring(0, 200)}`;
+        const hintEl = document.getElementById("error-hint");
+        if (hint) {
+          hintEl.style.display = "block";
+          hintEl.style.whiteSpace = "pre-line";
+          hintEl.textContent = hint;
+        } else {
+          hintEl.style.display = "none";
+        }
         showState("state-error");
       }
     } catch (err) {
@@ -319,8 +352,14 @@
 
   // ── Event: Retry ─────────────────────────────────────────────────────────────
   document.getElementById("btn-retry").addEventListener("click", () => {
+    document.getElementById("error-hint").style.display = "none";
     populateConfirm();
     showState("state-confirm");
+  });
+
+  // ── Event: Reset Token ───────────────────────────────────────────────────────
+  document.getElementById("btn-reset-token").addEventListener("click", () => {
+    resetToken();
   });
 
   // ── Init ─────────────────────────────────────────────────────────────────────
