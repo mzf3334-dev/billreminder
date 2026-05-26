@@ -58,12 +58,7 @@ def build_bill_row(bill: dict, is_paid: bool, mark_url: str) -> str:
             <div class="bill-name">{bill['name_zh']} {late_tag}</div>
             <div class="bill-meta">{bill['name_en']} &nbsp;·&nbsp; {freq}</div>
           </td>
-          <td style="padding:14px 18px 14px 10px;vertical-align:middle;white-space:nowrap;">
-            <span class="status-badge unpaid">⏳ 未繳</span>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="3" style="padding:0 14px 14px;">
+          <td style="padding:10px 12px 10px 6px;vertical-align:middle;white-space:nowrap;">
             <a class="btn-paid" href="{mark_url}">✓ 標記已繳</a>
           </td>
         </tr>
@@ -171,33 +166,31 @@ def generate_html(
                margin-bottom:10px;}}
     .bill-row.unpaid{{border-color:#fed7d7;background:#fff5f5;}}
     .bill-row.paid{{border-color:#c6f6d5;background:#f0fff4;}}
-    .bill-icon{{font-size:22px;padding:14px 0 14px 18px;vertical-align:middle;
-                width:36px;}}
-    .bill-info{{padding:14px 10px;vertical-align:middle;}}
-    .bill-name{{font-size:15px;font-weight:700;}}
-    .bill-meta{{font-size:12px;color:#718096;margin-top:2px;}}
+    .bill-icon{{font-size:20px;padding:12px 6px 12px 12px;vertical-align:middle;
+                width:30px;}}
+    .bill-info{{padding:12px 6px;vertical-align:middle;}}
+    .bill-name{{font-size:13px;font-weight:700;}}
+    .bill-meta{{font-size:11px;color:#718096;margin-top:2px;}}
     .late-fee-tag{{display:inline-block;background:#fff3cd;color:#856404;
-      border:1px solid #ffc107;border-radius:6px;font-size:11px;font-weight:600;
-      padding:1px 7px;margin-left:6px;vertical-align:middle;}}
-    .status-badge{{flex-shrink:0;border-radius:20px;font-size:12px;
-                   font-weight:700;padding:4px 12px;}}
+      border:1px solid #ffc107;border-radius:6px;font-size:10px;font-weight:600;
+      padding:1px 5px;margin-left:4px;vertical-align:middle;}}
+    .status-badge{{border-radius:20px;font-size:11px;
+                   font-weight:700;padding:3px 9px;}}
     .status-badge.unpaid{{background:#fff5f5;color:#c53030;border:1.5px solid #fc8181;}}
     .status-badge.paid{{background:#f0fff4;color:#276749;border:1.5px solid #68d391;}}
-    .btn-paid{{display:block;width:100%;
+    .btn-paid{{display:inline-block;white-space:nowrap;
       background:linear-gradient(135deg,#38a169,#276749);color:#fff;
-      border:none;border-radius:8px;font-size:14px;font-weight:700;
-      padding:11px 14px;text-decoration:none;text-align:center;
+      border:none;border-radius:7px;font-size:11px;font-weight:700;
+      padding:7px 10px;text-decoration:none;
       box-shadow:0 2px 6px rgba(56,161,105,.35);}}
     @media only screen and (max-width:480px){{
-      body{{padding:12px 8px;}}
-      .header{{padding:20px 18px 16px;}}
-      .header h1{{font-size:18px;}}
-      .body{{padding:18px 14px;}}
-      .summary-item .num{{font-size:22px;}}
-      .bill-icon{{font-size:20px;}}
-      .bill-name{{font-size:14px;}}
-      .status-badge{{font-size:11px;padding:3px 9px;}}
-      .footer{{padding:16px 14px;}}
+      body{{padding:8px 4px;}}
+      .header{{padding:18px 14px 14px;}}
+      .header h1{{font-size:17px;}}
+      .body{{padding:14px 10px;}}
+      .summary-item{{padding:12px 6px;}}
+      .summary-item .num{{font-size:20px;}}
+      .footer{{padding:14px 10px;}}
     }}
     .alert{{display:flex;gap:12px;align-items:flex-start;background:#fffbeb;
             border:1.5px solid #f6c84b;border-radius:10px;padding:14px 18px;
