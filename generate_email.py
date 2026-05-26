@@ -35,27 +35,37 @@ def build_bill_row(bill: dict, is_paid: bool, mark_url: str) -> str:
 
     if is_paid:
         return f"""
-      <div class="bill-row paid">
-        <div class="bill-icon">{bill['icon']}</div>
-        <div class="bill-info">
-          <div class="bill-name" style="text-decoration:line-through;color:#718096;">
-            {bill['name_zh']} {late_tag}
-          </div>
-          <div class="bill-meta">{bill['name_en']} &nbsp;·&nbsp; {freq}</div>
-        </div>
-        <div class="status-badge paid">✅ 已繳</div>
-      </div>"""
+      <table class="bill-row paid" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td class="bill-icon">{bill['icon']}</td>
+          <td class="bill-info">
+            <div class="bill-name" style="text-decoration:line-through;color:#718096;">
+              {bill['name_zh']} {late_tag}
+            </div>
+            <div class="bill-meta">{bill['name_en']} &nbsp;·&nbsp; {freq}</div>
+          </td>
+          <td style="padding:14px 18px 14px 10px;vertical-align:middle;white-space:nowrap;">
+            <span class="status-badge paid">✅ 已繳</span>
+          </td>
+        </tr>
+      </table>"""
     else:
         return f"""
-      <div class="bill-row unpaid">
-        <div class="bill-icon">{bill['icon']}</div>
-        <div class="bill-info">
-          <div class="bill-name">{bill['name_zh']} {late_tag}</div>
-          <div class="bill-meta">{bill['name_en']} &nbsp;·&nbsp; {freq}</div>
-        </div>
-        <div class="status-badge unpaid">⏳ 未繳</div>
-        <a class="btn-paid" href="{mark_url}">✓ 標記已繳</a>
-      </div>"""
+      <table class="bill-row unpaid" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td class="bill-icon">{bill['icon']}</td>
+          <td class="bill-info">
+            <div class="bill-name">{bill['name_zh']} {late_tag}</div>
+            <div class="bill-meta">{bill['name_en']} &nbsp;·&nbsp; {freq}</div>
+          </td>
+          <td style="padding:14px 8px 14px 10px;vertical-align:middle;white-space:nowrap;">
+            <span class="status-badge unpaid">⏳ 未繳</span>
+          </td>
+          <td style="padding:14px 18px 14px 4px;vertical-align:middle;white-space:nowrap;">
+            <a class="btn-paid" href="{mark_url}">✓ 標記已繳</a>
+          </td>
+        </tr>
+      </table>"""
 
 
 def generate_html(
@@ -144,8 +154,8 @@ def generate_html(
     .header .date-badge{{display:inline-block;margin-top:14px;
       background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);
       border-radius:20px;padding:4px 14px;font-size:13px;font-weight:600;}}
-    .summary{{display:flex;border-bottom:1px solid #e2e8f0;}}
-    .summary-item{{flex:1;padding:18px 12px;text-align:center;
+    .summary{{width:100%;border-collapse:collapse;border-bottom:1px solid #e2e8f0;}}
+    .summary-item{{width:33.33%;padding:18px 12px;text-align:center;
                    border-right:1px solid #e2e8f0;}}
     .summary-item:last-child{{border-right:none;}}
     .summary-item .num{{font-size:28px;font-weight:800;line-height:1;}}
@@ -153,13 +163,15 @@ def generate_html(
     .body{{padding:28px 36px;}}
     .section-title{{font-size:13px;font-weight:700;text-transform:uppercase;
                     letter-spacing:1px;color:#a0aec0;margin-bottom:14px;}}
-    .bill-list{{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}}
-    .bill-row{{display:flex;align-items:center;gap:14px;padding:14px 18px;
-               border-radius:10px;border:1.5px solid #e2e8f0;background:#f7fafc;}}
+    .bill-list{{display:block;margin-bottom:28px;}}
+    .bill-row{{width:100%;border-collapse:separate;border-spacing:0;
+               border-radius:10px;border:1.5px solid #e2e8f0;background:#f7fafc;
+               margin-bottom:10px;}}
     .bill-row.unpaid{{border-color:#fed7d7;background:#fff5f5;}}
-    .bill-row.paid{{border-color:#c6f6d5;background:#f0fff4;opacity:.82;}}
-    .bill-icon{{font-size:22px;flex-shrink:0;}}
-    .bill-info{{flex:1 1 auto;min-width:0;}}
+    .bill-row.paid{{border-color:#c6f6d5;background:#f0fff4;}}
+    .bill-icon{{font-size:22px;padding:14px 0 14px 18px;vertical-align:middle;
+                width:36px;}}
+    .bill-info{{padding:14px 10px;vertical-align:middle;}}
     .bill-name{{font-size:15px;font-weight:700;}}
     .bill-meta{{font-size:12px;color:#718096;margin-top:2px;}}
     .late-fee-tag{{display:inline-block;background:#fff3cd;color:#856404;
@@ -180,12 +192,11 @@ def generate_html(
       .header h1{{font-size:18px;}}
       .body{{padding:18px 14px;}}
       .summary-item .num{{font-size:22px;}}
-      .bill-row{{flex-wrap:wrap;gap:8px;padding:10px 12px;}}
       .bill-icon{{font-size:20px;}}
       .bill-name{{font-size:14px;}}
       .status-badge{{font-size:11px;padding:3px 9px;}}
       .btn-paid{{display:block;width:100%;text-align:center;
-        padding:9px 0;font-size:13px;margin-top:4px;}}
+        padding:9px 0;font-size:13px;}}
       .footer{{padding:16px 14px;}}
     }}
     .alert{{display:flex;gap:12px;align-items:flex-start;background:#fffbeb;
@@ -207,20 +218,22 @@ def generate_html(
     <div class="date-badge">📅 {date_str}</div>
   </div>
 
-  <div class="summary">
-    <div class="summary-item">
-      <div class="num" style="color:#2b6cb0;">{total_count}</div>
-      <div class="label">本月帳單</div>
-    </div>
-    <div class="summary-item">
-      <div class="num" style="{unpaid_style}">{unpaid_count}</div>
-      <div class="label">待繳費</div>
-    </div>
-    <div class="summary-item">
-      <div class="num" style="color:#38a169;">{paid_count}</div>
-      <div class="label">已繳費</div>
-    </div>
-  </div>
+  <table class="summary" width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+      <td class="summary-item">
+        <div class="num" style="color:#2b6cb0;">{total_count}</div>
+        <div class="label">本月帳單</div>
+      </td>
+      <td class="summary-item">
+        <div class="num" style="{unpaid_style}">{unpaid_count}</div>
+        <div class="label">待繳費</div>
+      </td>
+      <td class="summary-item">
+        <div class="num" style="color:#38a169;">{paid_count}</div>
+        <div class="label">已繳費</div>
+      </td>
+    </tr>
+  </table>
 
   <div class="body">
     {alert_html}
