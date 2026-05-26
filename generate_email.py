@@ -58,10 +58,12 @@ def build_bill_row(bill: dict, is_paid: bool, mark_url: str) -> str:
             <div class="bill-name">{bill['name_zh']} {late_tag}</div>
             <div class="bill-meta">{bill['name_en']} &nbsp;·&nbsp; {freq}</div>
           </td>
-          <td style="padding:14px 8px 14px 10px;vertical-align:middle;white-space:nowrap;">
+          <td style="padding:14px 18px 14px 10px;vertical-align:middle;white-space:nowrap;">
             <span class="status-badge unpaid">⏳ 未繳</span>
           </td>
-          <td style="padding:14px 18px 14px 4px;vertical-align:middle;white-space:nowrap;">
+        </tr>
+        <tr>
+          <td colspan="3" style="padding:0 14px 14px;">
             <a class="btn-paid" href="{mark_url}">✓ 標記已繳</a>
           </td>
         </tr>
@@ -181,10 +183,10 @@ def generate_html(
                    font-weight:700;padding:4px 12px;}}
     .status-badge.unpaid{{background:#fff5f5;color:#c53030;border:1.5px solid #fc8181;}}
     .status-badge.paid{{background:#f0fff4;color:#276749;border:1.5px solid #68d391;}}
-    .btn-paid{{flex-shrink:0;display:inline-block;
+    .btn-paid{{display:block;width:100%;
       background:linear-gradient(135deg,#38a169,#276749);color:#fff;
-      border:none;border-radius:8px;font-size:12px;font-weight:700;
-      padding:7px 14px;text-decoration:none;white-space:nowrap;
+      border:none;border-radius:8px;font-size:14px;font-weight:700;
+      padding:11px 14px;text-decoration:none;text-align:center;
       box-shadow:0 2px 6px rgba(56,161,105,.35);}}
     @media only screen and (max-width:480px){{
       body{{padding:12px 8px;}}
@@ -195,8 +197,6 @@ def generate_html(
       .bill-icon{{font-size:20px;}}
       .bill-name{{font-size:14px;}}
       .status-badge{{font-size:11px;padding:3px 9px;}}
-      .btn-paid{{display:block;width:100%;text-align:center;
-        padding:9px 0;font-size:13px;}}
       .footer{{padding:16px 14px;}}
     }}
     .alert{{display:flex;gap:12px;align-items:flex-start;background:#fffbeb;
