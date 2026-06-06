@@ -6,7 +6,8 @@
       "phone": true
     },
     "6": {
-      "phone": true
+      "phone": true,
+      "management": true
     }
   }
 }
