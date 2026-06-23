@@ -8,7 +8,8 @@
     "6": {
       "phone": true,
       "management": true,
-      "gas": true
+      "gas": true,
+      "electricity": true
     }
   }
 }
