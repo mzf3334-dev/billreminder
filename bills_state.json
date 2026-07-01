@@ -10,6 +10,9 @@
       "management": true,
       "gas": true,
       "electricity": true
+    },
+    "7": {
+      "rates": true
     }
   }
 }
