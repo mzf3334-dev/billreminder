@@ -12,7 +12,8 @@
       "electricity": true
     },
     "7": {
-      "rates": true
+      "rates": true,
+      "phone": true
     }
   }
 }
