@@ -13,7 +13,8 @@
     },
     "7": {
       "rates": true,
-      "phone": true
+      "phone": true,
+      "management": true
     }
   }
 }
