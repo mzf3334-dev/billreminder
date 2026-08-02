@@ -15,6 +15,9 @@
       "rates": true,
       "phone": true,
       "management": true
+    },
+    "8": {
+      "electricity": true
     }
   }
 }
