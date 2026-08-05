@@ -17,7 +17,8 @@
       "management": true
     },
     "8": {
-      "electricity": true
+      "electricity": true,
+      "gas": true
     }
   }
 }
