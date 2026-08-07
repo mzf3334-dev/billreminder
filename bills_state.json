@@ -18,7 +18,8 @@
     },
     "8": {
       "electricity": true,
-      "gas": true
+      "gas": true,
+      "phone": true
     }
   }
 }
