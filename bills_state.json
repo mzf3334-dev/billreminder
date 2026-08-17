@@ -19,7 +19,8 @@
     "8": {
       "electricity": true,
       "gas": true,
-      "phone": true
+      "phone": true,
+      "management": true
     }
   }
 }
