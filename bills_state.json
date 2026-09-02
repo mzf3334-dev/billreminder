@@ -21,6 +21,9 @@
       "gas": true,
       "phone": true,
       "management": true
+    },
+    "9": {
+      "management": true
     }
   }
 }
