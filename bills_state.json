@@ -23,7 +23,8 @@
       "management": true
     },
     "9": {
-      "management": true
+      "management": true,
+      "water": true
     }
   }
 }
