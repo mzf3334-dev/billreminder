@@ -24,7 +24,8 @@
     },
     "9": {
       "management": true,
-      "water": true
+      "water": true,
+      "phone": true
     }
   }
 }
