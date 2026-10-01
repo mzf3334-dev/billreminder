@@ -26,6 +26,9 @@
       "management": true,
       "water": true,
       "phone": true
+    },
+    "10": {
+      "rates": true
     }
   }
 }
