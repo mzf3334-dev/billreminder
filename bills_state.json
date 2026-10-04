@@ -29,7 +29,8 @@
     },
     "10": {
       "rates": true,
-      "electricity": true
+      "electricity": true,
+      "gas": true
     }
   }
 }
