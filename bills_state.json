@@ -30,7 +30,8 @@
     "10": {
       "rates": true,
       "electricity": true,
-      "gas": true
+      "gas": true,
+      "management": true
     }
   }
 }
