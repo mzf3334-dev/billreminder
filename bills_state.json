@@ -31,7 +31,8 @@
       "rates": true,
       "electricity": true,
       "gas": true,
-      "management": true
+      "management": true,
+      "phone": true
     }
   }
 }
